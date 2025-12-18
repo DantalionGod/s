@@ -3,7 +3,6 @@
 SITES_FILE="sites.txt"
 OUTPUT_DIR="resultnucleibos"
 DISCORD_WEBHOOK="https://discord.com/api/webhooks/1451249120760037440/3_VDYQP3rT4NTp5HKwdpAndSvdRZtmvuN1r0ANVNcyal7vA_OEgCh8IaIAt8sAWn-cKO"
-NUCLEI_TEMPLATES="cves,xss"
 RATE_LIMIT=150
 
 mkdir -p "$OUTPUT_DIR"
@@ -19,7 +18,7 @@ while IFS= read -r SITE || [[ -n "$SITE" ]]; do
 
     nuclei \
         -u "$SITE" \
-        -t "$NUCLEI_TEMPLATES" \
+        -tags cve,xss \
         -rate-limit "$RATE_LIMIT" \
         -o "$OUTPUT_FILE" \
         -stats
@@ -34,7 +33,7 @@ while IFS= read -r SITE || [[ -n "$SITE" ]]; do
             }" \
             -F "file=@$OUTPUT_FILE"
     else
-        echo "[-] Nenhum resultado para $SITE (arquivo vazio)"
+        echo "[-] Nenhum resultado para $SITE"
         rm -f "$OUTPUT_FILE"
     fi
 
