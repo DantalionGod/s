@@ -3,7 +3,6 @@
 SITES_FILE="sites.txt"
 OUTPUT_DIR="resultnucleibos"
 DISCORD_WEBHOOK="https://discord.com/api/webhooks/1451249120760037440/3_VDYQP3rT4NTp5HKwdpAndSvdRZtmvuN1r0ANVNcyal7vA_OEgCh8IaIAt8sAWn-cKO"
-RATE_LIMIT=150
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -18,10 +17,9 @@ while IFS= read -r SITE || [[ -n "$SITE" ]]; do
 
     nuclei \
         -u "$SITE" \
-        -tags cve,xss \
-        -rate-limit "$RATE_LIMIT" \
-        -o "$OUTPUT_FILE" \
-        -stats
+        -severity critical,high \
+        -silent \
+        -o "$OUTPUT_FILE"
 
     if [[ -s "$OUTPUT_FILE" ]]; then
         echo "[+] Enviando resultado para o Discord: $SAFE_NAME.txt"
@@ -29,11 +27,11 @@ while IFS= read -r SITE || [[ -n "$SITE" ]]; do
         curl -s -X POST "$DISCORD_WEBHOOK" \
             -F "payload_json={
                 \"username\": \"Nuclei Scanner\",
-                \"content\": \"📌 **Scan finalizado**\\n🌐 Site: $SITE\"
+                \"content\": \"🚨 **VULNERABILIDADES CRÍTICAS/ALTAS ENCONTRADAS**\\n🌐 Site: $SITE\"
             }" \
             -F "file=@$OUTPUT_FILE"
     else
-        echo "[-] Nenhum resultado para $SITE"
+        echo "[-] Nenhum achado crítico/alto para $SITE"
         rm -f "$OUTPUT_FILE"
     fi
 
